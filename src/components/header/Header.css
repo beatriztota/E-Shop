@@ -1,0 +1,37 @@
+.header {
+  padding-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  text-decoration: none; 
+  margin-left: 26rem;
+}
+
+.logo-img {
+  margin-right: 0.5rem; 
+}
+
+.logo-text {
+  font-weight: 800;
+  font-size: 1.875rem;
+  color: #ffffff;
+}
+
+.logo-highlight {
+  color: #86efac;
+}
+
+.flex-gap {
+  display: flex;
+  gap: 0.75rem;
+  margin-right: 26rem;
+}
