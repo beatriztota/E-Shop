@@ -1,6 +1,6 @@
 # E-Shop
 
-![E-Shop](src/components/header/e-shop.PNG)
+![E-Shop](e-shop\src\components\header\e-shop.PNG)
 
 E-Shop é uma aplicação de e-commerce desenvolvida com React.js, que oferece uma experiência de compra moderna e intuitiva. Utiliza a API do Stripe para os produtos e inclui funcionalidades de carrinho e favoritos para melhorar a experiência do usuário.
 
