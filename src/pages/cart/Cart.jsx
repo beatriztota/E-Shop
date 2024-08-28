@@ -2,6 +2,9 @@ import React from "react";
 import { useCart } from "../../context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { loadStripe } from "@stripe/stripe-js";
+const stripePromise = loadStripe("pk_test_51Pelx3ErqJjxVJ4dTzgVvwN2NYHvJQe7zm2maStQ0V74U6h2k183ulV1LX9210F3qi9k2Uj76JaUlfq15kihbtxS00EPwLUujC");
+
 
 const Cart = () => {
   const {
@@ -18,7 +21,7 @@ const Cart = () => {
       display: "flex",
       justifyContent: "center",
       padding: "20px",
-      height: "calc(100vh - 80px)", 
+      height: "calc(100vh - 80px)",
       overflowY: "hidden",
     },
     header: {
@@ -37,8 +40,8 @@ const Cart = () => {
     },
     productList: {
       width: "50%",
-      maxHeight: "calc(100vh - 150px)", 
-      overflowY: "auto", 
+      maxHeight: "calc(100vh - 150px)",
+      overflowY: "auto",
       marginRight: "20px",
     },
     cartSummary: {
@@ -47,12 +50,12 @@ const Cart = () => {
       padding: "20px",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "space-between", 
-      height: "calc(20vh - 20px)", 
+      justifyContent: "space-between",
+      height: "calc(20vh - 20px)",
     },
     summaryRow: {
       display: "flex",
-      justifyContent: "space-between", 
+      justifyContent: "space-between",
       color: "#b0b0b0",
       marginBottom: "10px",
     },
@@ -62,7 +65,7 @@ const Cart = () => {
       marginBottom: "10px",
       borderBottom: "1px solid white",
       paddingBottom: "10px",
-      height: "150px", 
+      height: "150px",
     },
     productImage: {
       width: "112px",
@@ -76,12 +79,12 @@ const Cart = () => {
     productName: {
       color: "white",
       marginBottom: "5px",
-      fontSize: "18px", 
+      fontSize: "18px",
     },
     productPrice: {
       color: "#b0b0b0",
       marginBottom: "10px",
-      fontSize: "16px", 
+      fontSize: "16px",
     },
     quantityControl: {
       display: "flex",
@@ -120,12 +123,36 @@ const Cart = () => {
       cursor: "pointer",
       fontSize: "18px",
       fontWeight: "bold",
-      marginTop: "20px", 
+      marginTop: "20px",
     },
     quantityText: {
       color: "white",
       fontSize: "18px",
     },
+  };
+
+  const handleCheckout = async () => {
+    const stripe = await stripePromise;
+
+    const response = await fetch("/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items: cartItems,
+      }),
+    });
+
+    const sessionId = await response.json();
+
+    const result = await stripe.redirectToCheckout({
+      sessionId: sessionId.id,
+    });
+
+    if (result.error) {
+      console.error(result.error.message);
+    }
   };
 
   return (
@@ -141,7 +168,10 @@ const Cart = () => {
             alt="Carrinho vazio"
             style={{ width: "200px", height: "auto" }}
           />
-           <p style={{ color: "white" }}> Ops! Parece que a sua sacola está vazia 😞</p>
+          <p style={{ color: "white" }}>
+            {" "}
+            Ops! Parece que a sua sacola está vazia 😞
+          </p>
         </div>
       ) : (
         <div style={styles.container}>
@@ -156,7 +186,7 @@ const Cart = () => {
                 <div style={styles.productInfo}>
                   <h2 style={styles.productName}>{item.name}</h2>
                   <p style={styles.productPrice}>
-                     R${(item.price / 100).toFixed(2)}
+                    R${(item.price / 100).toFixed(2)}
                   </p>
                   <div style={styles.quantityControl}>
                     <button
@@ -165,7 +195,9 @@ const Cart = () => {
                     >
                       <FontAwesomeIcon icon={faMinus} />
                     </button>
-                    <span style={styles.quantityText}>{item.quantity || 1}</span>
+                    <span style={styles.quantityText}>
+                      {item.quantity || 1}
+                    </span>
                     <button
                       onClick={() => increaseItemQuantity(item)}
                       style={styles.iconButton}
@@ -185,18 +217,20 @@ const Cart = () => {
           </div>
           <div style={styles.cartSummary}>
             <div style={styles.summaryRow}>
+              <span style={styles.totalText}>Quantidade</span>
               <span style={styles.totalText}>
-                Quantidade
-              </span>
-              <span style={styles.totalText}>
-                {totalQuantity} ite{totalQuantity > 1 ? 'ns' : 'm'}
+                {totalQuantity} ite{totalQuantity > 1 ? "ns" : "m"}
               </span>
             </div>
             <div style={styles.summaryRow}>
               <span style={styles.totalText}>Valor total</span>
-              <span style={styles.totalAmount}>R${(cartTotal / 100).toFixed(2)}</span>
+              <span style={styles.totalAmount}>
+                R${(cartTotal / 100).toFixed(2)}
+              </span>
             </div>
-            <button style={styles.checkoutButton}>Finalizar compra</button>
+            <button style={styles.checkoutButton} onClick={handleCheckout}>
+              Finalizar compra
+            </button>
           </div>
         </div>
       )}
